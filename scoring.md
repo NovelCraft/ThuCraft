@@ -47,9 +47,9 @@ $$
 \begin{aligned}
 Y_\text{战斗与生存} = 
     &\frac{1}{1 + 20\%\times X_\text{死亡}} \times\\
-    (
+    &(
         1 +
-        &5\% \times X_\text{杀敌} +\\
+        5\% \times X_\text{杀敌} +\\
         &0.1\% \times X_\text{造成伤害} +\\
         &0.1\% \times X_\text{回复} +\\
         &0.1\% \times X_\text{受到伤害}
