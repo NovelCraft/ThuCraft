@@ -1,4 +1,4 @@
-# ThuCraft
+# ThuCraft - 幻想与生存的冒险谭
 
 ThuCraft是清华大学第六届人工智能挑战赛的自动化系赛道。
 
