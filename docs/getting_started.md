@@ -1,10 +1,18 @@
 # 快速开始
 
+## 下载LipUI（仅Windows）
+
+[点击我](https://dlproxy.novelcraft.games/https://github.com/NovelCraft/LipUI/releases/latest/download/LipUI-net462-win10-x64.zip)下载LipUI。下载后运行即可。首次运行时需要下载Lip。如果杀毒软件报毒，请将LipUI和Lip添加到信任列表中。
+
+## 下载Lip
+
+如果你使用的不是Windows，或希望使用命令行界面，可以前往<https://github.com/LipPkg/Lip/releases/latest>下载Lip。下载后放在方便的地方即可。
+
 ## 运行服务端
 
-前往<https://github.com/NovelCraft/Server/releases>下载最新版本的服务端。我们提供了多种平台的服务端，你可以根据自己的需要下载。
+如果你使用LipUI，打开LipUI，安装NovelCraft Server。
 
-解压下载得到的压缩包。
+如果你使用Lip，首先将环境变量`LIP_REGISTRY`设为`https://registry.novelcraft.games`，然后运行`lip install server`。
 
 运行`Server.exe`（Windows）或`Server`（非Windows）。
 
@@ -16,9 +24,9 @@
 
 ## 运行客户端
 
-前往<https://github.com/NovelCraft/Client/releases>下载最新版本的客户端。我们提供了多种平台的客户端，你可以根据自己的需要下载。
+如果你使用LipUI，打开LipUI，安装NovelCraft Client。
 
-解压下载得到的压缩包。
+如果你使用Lip，首先将环境变量`LIP_REGISTRY`设为`https://registry.novelcraft.games`，然后运行`lip install client`。
 
 运行`Client.exe`（Windows）或`Client`（非Windows）。
 
