@@ -2,7 +2,7 @@
 
 ## 下载LipUI（仅Windows）
 
-[点击我](https://dlproxy.novelcraft.games/https://github.com/NovelCraft/LipUI/releases/latest/download/LipUI-net462-win10-x64.zip)下载LipUI。下载后运行即可。首次运行时需要下载Lip。如果杀毒软件报毒，请将LipUI和Lip添加到信任列表中。
+[点击我](https://ghproxy.com/https://github.com/NovelCraft/LipUI/releases/latest/download/LipUI-net462-win10-x64.zip)下载LipUI。下载后运行即可。首次运行时需要下载Lip。如果杀毒软件报毒，请将LipUI和Lip添加到信任列表中。
 
 ## 下载Lip
 
