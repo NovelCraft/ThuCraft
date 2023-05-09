@@ -1,10 +1,17 @@
+
 # 评分标准
 
-比赛中，选手的成绩将由评委根据选手的智能体的表现情况进行评分。评分共分为四个乘区，分别为行动、战斗与生存、探索、创造。总分为四个乘区分值之积，设总分为$Y$，各乘区分值分别为 $Y_\text{行动}$、$Y_\text{战斗与生存}$、$Y_\text{探索}$、$Y_\text{创造}$，则总分为：
+比赛中，选手的成绩将由评委根据选手的智能体的表现情况进行评分。评分共分为四个乘区，分别为行动、战斗与生存、探索、创造。总分为四个乘区分值之积，设总分为$Y$，各乘区分值分别为 $Y_\text{行动}$、 $Y_\text{战斗与生存}$、 $Y_\text{探索}$、 $Y_\text{创造}$，则总分为：
 
-$$
-Y = Y_\text{行动} \times Y_\text{战斗与生存} \times Y_\text{探索} \times Y_\text{创造} 
-$$
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p>$$Y = Y_\text{行动} \times Y_\text{战斗与生存} \times Y_\text{探索} \times Y_\text{创造} $$</p>
+  </body>
+</html>
 以下分别做出说明：
 
 ## 行动乘区
@@ -38,7 +45,13 @@ $$
 
 则战斗乘区的分值为：
 
-$$
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p>$$
 \begin{aligned}
 Y_\text{战斗与生存} = 
     &\frac{1}{1 + 20\%\times X_\text{死亡}} \times\\
@@ -49,7 +62,9 @@ Y_\text{战斗与生存} =
         &0.1\% \times X_\text{受到伤害}
     )
 \end{aligned}
-$$
+$$</p>
+  </body>
+</html>
 
 ## 探索乘区
 
@@ -67,18 +82,25 @@ $$
 
 则探索乘区的分值为：
 
-$$
-\begin{aligned}
-Y_\text{探索} =
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p>$$
+ \begin{aligned}
+ Y_\text{探索} =
     1 +
-
     &1\% \times X_\text{煤矿} +\\
     &2\% \times X_\text{铁矿} +\\
     &4\% \times X_\text{金矿} +\\
     &8\% \times X_\text{钻石矿} +\\
     &1\% \times X_\text{树叶} 
-\end{aligned}
-$$
+ \end{aligned}
+$$</p>
+  </body>
+</html>
 
 ## 创造乘区
 
@@ -96,7 +118,13 @@ $$
 
 则创造乘区的分值为：
 
-$$
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <p>$$
 \begin{aligned}
 Y_\text{创造} =
     1 +
@@ -106,4 +134,6 @@ Y_\text{创造} =
     &8\% \times X_\text{新的金制工具} +\\
     &16\% \times X_\text{新的钻石制工具}
 \end{aligned}
-$$
+$$</p>
+  </body>
+</html>
