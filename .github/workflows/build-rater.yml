@@ -37,7 +37,7 @@ jobs:
       - name: Build
         run: |
           dotnet publish rater/Rater.csproj -c Release -o build/rater --sc false -r ${{ matrix.runtime }} \
-          -p:DebugType=none -p:PublishSingleFile=true
+          -f net6.0 -p:DebugType=none -p:PublishSingleFile=true
 
       - uses: actions/upload-artifact@v3
         with:
