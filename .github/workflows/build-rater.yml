@@ -1,0 +1,45 @@
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        runtime:
+          - linux-arm
+          - linux-arm64
+          - linux-x64
+          - linux-musl-arm
+          - linux-musl-arm64
+          - linux-musl-x64
+          - osx-arm64
+          - osx-x64
+          - win-arm
+          - win-arm64
+          - win-x64
+          - win-x86
+        include:
+          - runs-on: ubuntu-latest
+          - runs-on: macos-latest
+            runtime: osx-x64
+          - runs-on: macos-latest
+            runtime: osx-arm64
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Build
+        run: |
+          dotnet publish rater/Rater.csproj -c Release -o build/rater --sc false -r ${{ matrix.runtime }} \
+          -p:DebugType=none -p:PublishSingleFile=true
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: thucraft-rater-${{ matrix.runtime }}
+          path: build/rater
