@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 /// <summary>
@@ -7,12 +8,28 @@ using Newtonsoft.Json.Linq;
 /// </summary>
 public class Rater {
   public class RatingData {
+    // Action
+    public int Actions { get; set; } = 0;
+
+    // Survival
     public int Kills { get; set; } = 0;
     public int Deaths { get; set; } = 0;
     public decimal DamageDealt { get; set; } = 0m;
     public decimal DamageTaken { get; set; } = 0m;
     public decimal Healed { get; set; } = 0m;
+
+    // Exploration
     public HashSet<(int, int, int)> SectionVisisted { get; set; } = new HashSet<(int, int, int)>();
+    public int CoalOreMined { get; set; } = 0;
+    public int IronOreMined { get; set; } = 0;
+    public int GoldOreMined { get; set; } = 0;
+    public int DiamondOreMined { get; set; } = 0;
+    public int LeavesBroken { get; set; } = 0;
+    public HashSet<int> BlockTypesBroken { get; set; } = new HashSet<int>();
+
+    // Creation
+    public HashSet<int> ItemTypesGot { get; set; } = new HashSet<int>();
+    public HashSet<int> BlockTypesPlaced { get; set; } = new HashSet<int>();
   }
 
   private Dictionary<int, RatingData> _ratingData = new Dictionary<int, RatingData>(); // uid -> rating data
@@ -34,16 +51,20 @@ public class Rater {
       JObject recordData = record["data"]?.ToObject<JObject>() ?? throw new Exception("Missing record data.");
 
       switch (identifier) {
-        case "after_block_change":
-          HandleAfterBlockChange(recordData);
-          break;
-
         case "after_entity_despawn":
           HandleAfterEntityDespawn(recordData);
           break;
 
         case "after_entity_hurt":
           HandleAfterEntityHurt(recordData);
+          break;
+
+        case "after_entity_position_change":
+          HandleAfterEntityPositionChange(recordData);
+          break;
+
+        case "after_player_inventory_change":
+          HandleAfterPlayerInventoryChange(recordData);
           break;
 
         default:
@@ -61,14 +82,28 @@ public class Rater {
   /// <param name="uniqueId">The unique ID.</param>
   /// <returns>The rating.</returns>
   public Rating GetRating(int uniqueId) {
-    // TODO: Implement.
     RatingData ratingData = GetRatingData(uniqueId);
+    HashSet<int> itemTypesGot = ratingData.ItemTypesGot;
     return new Rating {
-      Action = 1,
-      Survival = (1 + 0.001m * ratingData.DamageDealt + 0.001m * ratingData.DamageTaken)
+      Action = 10 * (decimal)Math.Tanh(0.0001 * ratingData.Actions),
+
+      Survival = (1 + 0.05m * ratingData.Kills + 0.001m * ratingData.DamageDealt
+                    + 0.001m * ratingData.Healed + 0.001m * ratingData.DamageTaken)
                / (1 + 0.2m * ratingData.Deaths),
-      Exploration = 1,
-      Creation = 1
+
+      Exploration = 1 + 0.2m * (decimal)Math.Log(ratingData.SectionVisisted.Count, 2)
+                      + 0.01m * ratingData.CoalOreMined + 0.02m * ratingData.IronOreMined
+                      + 0.04m * ratingData.GoldOreMined + 0.08m * ratingData.DiamondOreMined
+                      + 0.01m * ratingData.LeavesBroken
+                      + 0.1m * ratingData.BlockTypesBroken.Count,
+
+      Creation = 1 + 0.1m * itemTypesGot.Count
+                   + 0.1m * ratingData.BlockTypesPlaced.Count
+                   + 0.01m * itemTypesGot.Where(s => (new List<int> { 9, 10, 11, 12 }).Contains(s)).Count()
+                   + 0.02m * itemTypesGot.Where(s => (new List<int> { 13, 14, 15, 16 }).Contains(s)).Count()
+                   + 0.04m * itemTypesGot.Where(s => (new List<int> { 24, 25, 26, 27 }).Contains(s)).Count()
+                   + 0.08m * itemTypesGot.Where(s => (new List<int> { 28, 29, 30, 31 }).Contains(s)).Count()
+                   + 0.16m * itemTypesGot.Where(s => (new List<int> { 32, 33, 34, 35 }).Contains(s)).Count()
     };
   }
 
@@ -82,20 +117,10 @@ public class Rater {
 
   private RatingData GetRatingData(int uniqueId) {
     if (!_ratingData.ContainsKey(uniqueId)) {
-      _ratingData.Add(uniqueId, new RatingData {
-        Kills = 0,
-        Deaths = 0,
-        DamageDealt = 0m,
-        DamageTaken = 0m,
-        Healed = 0m
-      });
+      _ratingData.Add(uniqueId, new RatingData());
     }
 
     return _ratingData[uniqueId];
-  }
-
-  private void HandleAfterBlockChange(JObject recordData) {
-    // TODO: Implement.
   }
 
   private void HandleAfterEntityDespawn(JObject recordData) {
@@ -131,6 +156,50 @@ public class Rater {
       if (damageCauseKind == 1) {
         int attackerUniqueId = (int?)damageCause["attacker_unique_id"] ?? throw new Exception("Missing attacker unique ID.");
         GetRatingData(attackerUniqueId).DamageDealt += damage;
+      }
+    }
+  }
+
+  private void HandleAfterEntityPositionChange(JObject recordData) {
+    JArray changeList = recordData["change_list"] as JArray ?? throw new Exception("Missing change list.");
+
+    foreach (JObject? change in changeList) {
+      if (change is null) {
+        throw new Exception("Null change item.");
+      }
+
+      int uniqueId = (int?)change["unique_id"] ?? throw new Exception("Missing unique ID.");
+      int x = (int)((decimal?)change["position"]?["x"] ?? throw new Exception("Missing x.")) / 16 * 16;
+      int y = (int)((decimal?)change["position"]?["y"] ?? throw new Exception("Missing y.")) / 16 * 16;
+      int z = (int)((decimal?)change["position"]?["z"] ?? throw new Exception("Missing z.")) / 16 * 16;
+
+      GetRatingData(uniqueId).SectionVisisted.Add((x, y, z));
+    }
+  }
+
+  private void HandleAfterPlayerInventoryChange(JObject recordData) {
+    JArray changeList = recordData["change_list"] as JArray ?? throw new Exception("Missing change list.");
+
+    foreach (JObject? change in changeList) {
+      if (change is null) {
+        throw new Exception("Null change item.");
+      }
+
+      int playerUniqueId = (int?)change["player_unique_id"] ?? throw new Exception("Missing player unique ID.");
+      JArray slotChangeList = change["change_list"] as JArray ?? throw new Exception("Missing slot change list.");
+
+      foreach (JObject? slotChange in slotChangeList) {
+        if (slotChange is null) {
+          throw new Exception("Null slot change item.");
+        }
+
+        int? item_type_id = (int?)slotChange["item_type_id"];
+
+        if (item_type_id is null) {
+          continue;
+        }
+
+        GetRatingData(playerUniqueId).ItemTypesGot.Add(item_type_id.Value);
       }
     }
   }
