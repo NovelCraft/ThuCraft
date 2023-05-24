@@ -67,6 +67,10 @@ public class Rater {
           HandleAfterPlayerInventoryChange(recordData);
           break;
 
+        case "after_receive_message":
+          HandleAfterReceiveMessage(recordData);
+          break;
+
         default:
           break;
       }
@@ -202,5 +206,10 @@ public class Rater {
         GetRatingData(playerUniqueId).ItemTypesGot.Add(item_type_id.Value);
       }
     }
+  }
+
+  private void HandleAfterReceiveMessage(JObject recordData) {
+    int playerUniqueId = (int?)recordData["unique_id"] ?? throw new Exception("Missing player unique ID.");
+    GetRatingData(playerUniqueId).Actions++;
   }
 }
