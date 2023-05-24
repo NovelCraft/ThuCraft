@@ -102,8 +102,12 @@ internal class Program {
         if (record is null) {
           continue;
         }
-
-        _rater.AddRecord(record);
+        try {
+          _rater.AddRecord(record);
+          
+        } catch (Exception e) {
+          _logger.Error($"Bad record: {e.Message}");
+        }
       }
 
     } catch (Exception e) {

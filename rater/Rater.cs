@@ -51,12 +51,24 @@ public class Rater {
       JObject recordData = record["data"]?.ToObject<JObject>() ?? throw new Exception("Missing record data.");
 
       switch (identifier) {
+        case "after_entity_break_block":
+          HandleAfterEntityBreakBlock(recordData);
+          break;
+
         case "after_entity_despawn":
           HandleAfterEntityDespawn(recordData);
           break;
 
+        case "after_entity_health_change":
+          HandleAfterEntityHeal(recordData);
+          break;
+
         case "after_entity_hurt":
           HandleAfterEntityHurt(recordData);
+          break;
+
+        case "after_entity_place_block":
+          HandleAfterEntityPlaceBlock(recordData);
           break;
 
         case "after_entity_position_change":
@@ -127,6 +139,35 @@ public class Rater {
     return _ratingData[uniqueId];
   }
 
+  private void HandleAfterEntityBreakBlock(JObject recordData) {
+    int entityUniqueId = (int?)recordData["entity_unique_id"] ?? throw new Exception("Missing entity unique ID.");
+    int blockTypeId = (int?)recordData["block_type_id"] ?? throw new Exception("Missing block type.");
+
+    GetRatingData(entityUniqueId).BlockTypesBroken.Add(blockTypeId);
+
+    switch (blockTypeId) {
+      case 16:
+        GetRatingData(entityUniqueId).CoalOreMined++;
+        break;
+
+      case 15:
+        GetRatingData(entityUniqueId).IronOreMined++;
+        break;
+
+      case 14:
+        GetRatingData(entityUniqueId).GoldOreMined++;
+        break;
+
+      case 56:
+        GetRatingData(entityUniqueId).DiamondOreMined++;
+        break;
+
+      case 18:
+        GetRatingData(entityUniqueId).LeavesBroken++;
+        break;
+    }
+  }
+
   private void HandleAfterEntityDespawn(JObject recordData) {
     JArray DespawnList = recordData["despawn_list"] as JArray ?? throw new Exception("Missing despawn list.");
 
@@ -138,6 +179,13 @@ public class Rater {
       int uniqueId = (int?)despawn["unique_id"] ?? throw new Exception("Missing unique ID.");
       GetRatingData(uniqueId).Deaths++;
     }
+  }
+
+  private void HandleAfterEntityHeal(JObject recordData) {
+    int entityUniqueId = (int?)recordData["entity_unique_id"] ?? throw new Exception("Missing entity unique ID.");
+    decimal heal_amount = (decimal?)recordData["heal_amount"] ?? throw new Exception("Missing heal amount.");
+
+    GetRatingData(entityUniqueId).Healed += heal_amount;
   }
 
   private void HandleAfterEntityHurt(JObject recordData) {
@@ -153,15 +201,27 @@ public class Rater {
       decimal damage = (decimal?)hurt["damage"] ?? throw new Exception("Missing damage.");
       GetRatingData(victim_unique_id).DamageTaken += damage;
 
-      // Damage dealt.
+      // Damage dealt and kills.
       JObject damageCause = hurt["damage_cause"] as JObject ?? throw new Exception("Missing damage cause.");
       int damageCauseKind = (int?)damageCause["kind"] ?? throw new Exception("Missing damage cause kind.");
 
       if (damageCauseKind == 1) {
         int attackerUniqueId = (int?)damageCause["attacker_unique_id"] ?? throw new Exception("Missing attacker unique ID.");
         GetRatingData(attackerUniqueId).DamageDealt += damage;
+
+        decimal healthAfterDamage = (decimal?)hurt["health_after_damage"] ?? throw new Exception("Missing health after damage.");
+        if (healthAfterDamage <= 0) {
+          GetRatingData(attackerUniqueId).Kills++;
+        }
       }
     }
+  }
+
+  private void HandleAfterEntityPlaceBlock(JObject recordData) {
+    int entityUniqueId = (int?)recordData["entity_unique_id"] ?? throw new Exception("Missing entity unique ID.");
+    int blockTypeId = (int?)recordData["block_type_id"] ?? throw new Exception("Missing block type.");
+
+    GetRatingData(entityUniqueId).BlockTypesPlaced.Add(blockTypeId);
   }
 
   private void HandleAfterEntityPositionChange(JObject recordData) {
