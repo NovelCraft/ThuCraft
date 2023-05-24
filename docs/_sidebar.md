@@ -8,6 +8,4 @@
 
 - [评分标准](scoring.md)
 
-- [成就系统](achievements.md)
-
 - [开发团队](developers.md)
