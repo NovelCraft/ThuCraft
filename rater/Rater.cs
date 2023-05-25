@@ -61,7 +61,7 @@ public class Rater {
           HandleAfterEntityDespawn(recordData);
           break;
 
-        case "after_entity_health_change":
+        case "after_entity_heal":
           HandleAfterEntityHeal(recordData);
           break;
 
