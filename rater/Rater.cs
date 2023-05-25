@@ -108,23 +108,23 @@ public class Rater {
     return new Rating {
       Action = 1 + 9 * (decimal)Math.Tanh(0.0001 * ratingData.Actions),
 
-      Survival = (1 + 0.05m * ratingData.Kills + 0.001m * ratingData.DamageDealt
-                    + 0.001m * ratingData.Healed + 0.001m * ratingData.DamageTaken)
+      Survival = (1 + 0.3m * ratingData.Kills + 0.02m * ratingData.DamageDealt
+                    + 0.1m * ratingData.Healed + 0.01m * ratingData.DamageTaken)
                / (1 + 0.2m * ratingData.Deaths),
 
-      Exploration = 1 + 0.2m * (decimal)Math.Log(ratingData.SectionVisisted.Count, 2)
-                      + 0.01m * ratingData.CoalOreMined + 0.02m * ratingData.IronOreMined
-                      + 0.04m * ratingData.GoldOreMined + 0.08m * ratingData.DiamondOreMined
+      Exploration = 1 + 0.5m * (decimal)Math.Log(ratingData.SectionVisisted.Count, 2)
+                      + 0.05m * ratingData.CoalOreMined + 0.06m * ratingData.IronOreMined
+                      + 0.12m * ratingData.GoldOreMined + 0.24m * ratingData.DiamondOreMined
                       + 0.01m * ratingData.LeavesBroken
-                      + 0.1m * ratingData.BlockTypesBroken.Count,
+                      + 0.3m * ratingData.BlockTypesBroken.Count,
 
       Creation = 1 + 0.1m * itemTypesGot.Count
-                   + 0.1m * ratingData.BlockTypesPlaced.Count
-                   + 0.01m * itemTypesGot.Where(s => (new List<int> { 9, 10, 11, 12 }).Contains(s)).Count()
-                   + 0.02m * itemTypesGot.Where(s => (new List<int> { 13, 14, 15, 16 }).Contains(s)).Count()
-                   + 0.04m * itemTypesGot.Where(s => (new List<int> { 24, 25, 26, 27 }).Contains(s)).Count()
-                   + 0.08m * itemTypesGot.Where(s => (new List<int> { 28, 29, 30, 31 }).Contains(s)).Count()
-                   + 0.16m * itemTypesGot.Where(s => (new List<int> { 32, 33, 34, 35 }).Contains(s)).Count()
+                   + 0.3m * ratingData.BlockTypesPlaced.Count
+                   + 0.05m * itemTypesGot.Where(s => (new List<int> { 9, 10, 11, 12 }).Contains(s)).Count()
+                   + 0.15m * itemTypesGot.Where(s => (new List<int> { 13, 14, 15, 16 }).Contains(s)).Count()
+                   + 0.25m * itemTypesGot.Where(s => (new List<int> { 24, 25, 26, 27 }).Contains(s)).Count()
+                   + 0.3m * itemTypesGot.Where(s => (new List<int> { 28, 29, 30, 31 }).Contains(s)).Count()
+                   + 0.5m * itemTypesGot.Where(s => (new List<int> { 32, 33, 34, 35 }).Contains(s)).Count()
     };
   }
 
@@ -214,8 +214,8 @@ public class Rater {
         int attackerUniqueId = (int?)damageCause["attacker_unique_id"] ?? throw new Exception("Missing attacker unique ID.");
         GetRatingData(attackerUniqueId).DamageDealt += damage;
 
-        decimal healthAfterDamage = (decimal?)hurt["health_after_damage"] ?? throw new Exception("Missing health after damage.");
-        if (healthAfterDamage <= 0) {
+        bool isDead = (bool?)hurt["is_dead"] ?? throw new Exception("Missing death flag.");
+        if (isDead) {
           GetRatingData(attackerUniqueId).Kills++;
         }
       }

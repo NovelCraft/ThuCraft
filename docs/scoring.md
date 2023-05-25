@@ -40,10 +40,10 @@ Y_\text{战斗与生存} =
     &\frac{1}{1 + 20\%\times X_\text{死亡}} \times\\
     &(
         1 +
-        5\% \times X_\text{杀敌} +\\
-        &0.1\% \times X_\text{造成伤害} +\\
-        &0.1\% \times X_\text{回复} +\\
-        &0.1\% \times X_\text{受到伤害}
+        30\% \times X_\text{杀敌} +\\
+        &2\% \times X_\text{造成伤害} +\\
+        &10\% \times X_\text{回复} +\\
+        &1\% \times X_\text{受到伤害}
     )
 \end{aligned}
 $$
@@ -72,15 +72,15 @@ $$
 \begin{aligned}
 Y_\text{探索} =
     1 +
-    &20\% \times \log_2{
+    &50\% \times \log_2{
         X_\text{探索}
     } +\\
-    &1\% \times X_\text{煤矿} +\\
-    &2\% \times X_\text{铁矿} +\\
-    &4\% \times X_\text{金矿} +\\
-    &8\% \times X_\text{钻石矿} +\\
+    &5\% \times X_\text{煤矿} +\\
+    &6\% \times X_\text{铁矿} +\\
+    &12\% \times X_\text{金矿} +\\
+    &24\% \times X_\text{钻石矿} +\\
     &1\% \times X_\text{树叶} +\\
-    &10\% \times X_\text{方块种类}
+    &30\% \times X_\text{方块种类}
 \end{aligned}
 $$
 
@@ -109,11 +109,11 @@ $$
 Y_\text{创造} =
     1 +
     &10\% \times X_\text{物品种类} +\\
-    &10\% \times X_\text{放置方块种类} +\\
-    &1\% \times X_\text{新的木制工具} +\\
-    &2\% \times X_\text{新的石制工具} +\\
-    &4\% \times X_\text{新的铁制工具} +\\
-    &8\% \times X_\text{新的金制工具} +\\
-    &16\% \times X_\text{新的钻石制工具}
+    &30\% \times X_\text{放置方块种类} +\\
+    &5\% \times X_\text{新的木制工具} +\\
+    &15\% \times X_\text{新的石制工具} +\\
+    &25\% \times X_\text{新的铁制工具} +\\
+    &30\% \times X_\text{新的金制工具} +\\
+    &50\% \times X_\text{新的钻石制工具}
 \end{aligned}
 $$
