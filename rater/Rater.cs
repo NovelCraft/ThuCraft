@@ -119,7 +119,7 @@ public class Rater {
                     + 0.1m * ratingData.Healed + 0.01m * ratingData.DamageTaken)
                / (1 + 0.2m * ratingData.Deaths),
 
-      Exploration = 1 + 0.5m * (decimal)Math.Log(ratingData.SectionVisisted.Count, 2)
+      Exploration = 1 + 0.5m * (decimal)Math.Log(Math.Max(ratingData.SectionVisisted.Count, 1), 2)
                       + 0.05m * ratingData.CoalOreMined + 0.06m * ratingData.IronOreMined
                       + 0.12m * ratingData.GoldOreMined + 0.24m * ratingData.DiamondOreMined
                       + 0.01m * ratingData.LeavesBroken
