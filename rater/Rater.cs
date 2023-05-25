@@ -140,7 +140,7 @@ public class Rater {
   /// </summary>
   /// <returns>The unique ID list.</returns>
   public List<int> GetUniqueIdList() {
-    return new List<int>(_ratingData.Keys);
+    return (from pair in _ratingData where !(pair.Value.Token is null) select pair.Key).ToList();
   }
 
   private RatingData GetRatingData(int uniqueId) {
