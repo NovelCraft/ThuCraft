@@ -158,6 +158,10 @@ public class Rater {
       string token = agent["token"]?.ToString() ?? throw new Exception("Missing agent token.");
       int uniqueId = (int?)agent["unique_id"] ?? throw new Exception("Missing agent unique ID.");
 
+      if((from uid in GetUniqueIdList() where GetRatingData(uid).Token == token select uid).Count() > 0) {
+        throw new Exception($"Token {token} already used.");
+      }
+
       GetRatingData(uniqueId).Token = token;
     }
   }
@@ -206,9 +210,13 @@ public class Rater {
 
   private void HandleAfterEntityHeal(JObject recordData) {
     int entityUniqueId = (int?)recordData["entity_unique_id"] ?? throw new Exception("Missing entity unique ID.");
-    decimal heal_amount = (decimal?)recordData["heal_amount"] ?? throw new Exception("Missing heal amount.");
+    decimal healAmount = (decimal?)recordData["heal_amount"] ?? throw new Exception("Missing heal amount.");
 
-    GetRatingData(entityUniqueId).Healed += heal_amount;
+    if (healAmount < 0) {
+      throw new Exception("Negative heal amount.");
+    }
+
+    GetRatingData(entityUniqueId).Healed += healAmount;
   }
 
   private void HandleAfterEntityHurt(JObject recordData) {
@@ -222,6 +230,11 @@ public class Rater {
       // Damage taken.
       int victim_unique_id = (int?)hurt["victim_unique_id"] ?? throw new Exception("Missing victim unique ID.");
       decimal damage = (decimal?)hurt["damage"] ?? throw new Exception("Missing damage.");
+
+      if (damage < 0) {
+        throw new Exception("Negative damage.");
+      }
+
       GetRatingData(victim_unique_id).DamageTaken += damage;
 
       // Damage dealt and kills.
