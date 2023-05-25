@@ -1,6 +1,9 @@
 using Newtonsoft.Json;
 
 public struct Rating {
+  [JsonIgnore]
+  public string? Token { get; set; }
+
   [JsonProperty("base")]
   public decimal Base => 1000m;
 

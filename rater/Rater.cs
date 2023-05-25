@@ -8,6 +8,8 @@ using Newtonsoft.Json.Linq;
 /// </summary>
 public class Rater {
   public class RatingData {
+    public string? Token { get; set; } = null;
+
     // Action
     public int Actions { get; set; } = 0;
 
@@ -53,6 +55,10 @@ public class Rater {
       JObject recordData = record["data"]?.ToObject<JObject>() ?? throw new Exception("Missing record data.");
 
       switch (identifier) {
+        case "after_agent_register":
+          HandleAfterAgentRegister(recordData);
+          break;
+
         case "after_entity_break_block":
           HandleAfterEntityBreakBlock(recordData);
           break;
@@ -106,6 +112,7 @@ public class Rater {
     RatingData ratingData = GetRatingData(uniqueId);
     HashSet<int> itemTypesGot = ratingData.ItemTypesGot;
     return new Rating {
+      Token = ratingData.Token,
       Action = 1 + 9 * (decimal)Math.Tanh(0.0001 * ratingData.Actions),
 
       Survival = (1 + 0.3m * ratingData.Kills + 0.02m * ratingData.DamageDealt
@@ -142,6 +149,17 @@ public class Rater {
     }
 
     return _ratingData[uniqueId];
+  }
+
+  private void HandleAfterAgentRegister(JObject recordData) {
+    JArray AgentList = recordData["agent_list"] as JArray ?? throw new Exception("Missing agent list.");
+
+    foreach (JObject agent in AgentList) {
+      string token = agent["token"]?.ToString() ?? throw new Exception("Missing agent token.");
+      int uniqueId = (int?)agent["unique_id"] ?? throw new Exception("Missing agent unique ID.");
+
+      GetRatingData(uniqueId).Token = token;
+    }
   }
 
   private void HandleAfterEntityBreakBlock(JObject recordData) {

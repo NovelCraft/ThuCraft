@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json.Linq;
 using ShellProgressBar;
 
@@ -13,7 +13,7 @@ internal class Program {
 
   private static void Main(string[] args) {
     if (args.Length < 2) {
-      Console.Error.WriteLine("Usage: rater <path to .nclevel file> <path to result JSON file>");
+      Console.Error.WriteLine("Usage: Rater <path to .nclevel file> <path to rating result JSON file>");
       return;
     }
 
@@ -42,10 +42,17 @@ internal class Program {
       _logger.Error(e.Message);
     }
 
-    Dictionary<int, Rating> result = _rater.GetUniqueIdList().ToDictionary(
-      uid => uid,
-      uid => _rater.GetRating(uid)
-    );
+    var result = new Dictionary<string, Rating>();
+
+    foreach (int uid in _rater.GetUniqueIdList()) {
+      var rating = _rater.GetRating(uid);
+
+      if (rating.Token is null) {
+        continue;
+      }
+
+      result[rating.Token] = rating;
+    }
 
     // Print out as JSON
     string json = JToken.FromObject(result).ToString();
@@ -109,7 +116,7 @@ internal class Program {
         }
         try {
           _rater.AddRecord(record);
-          
+
         } catch (Exception e) {
           _exceptions.Add(e);
         }
