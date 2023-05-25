@@ -7,8 +7,9 @@ using Newtonsoft.Json.Linq;
 using ShellProgressBar;
 
 internal class Program {
-  private static Logger _logger = new Logger("rater");
+  private static Logger _logger = new Logger("ThuCraft.Rater");
   private static Rater _rater = new Rater();
+  private static List<Exception> _exceptions = new List<Exception>();
 
   private static void Main(string[] args) {
     if (args.Length < 2) {
@@ -35,6 +36,10 @@ internal class Program {
 
     } catch (Exception e) {
       _logger.Error($"Bad .nclevel file {nclevelPath}: {e.Message}");
+    }
+
+    foreach (Exception e in _exceptions) {
+      _logger.Error(e.Message);
     }
 
     Dictionary<int, Rating> result = _rater.GetUniqueIdList().ToDictionary(
@@ -106,7 +111,7 @@ internal class Program {
           _rater.AddRecord(record);
           
         } catch (Exception e) {
-          _logger.Error($"Bad record: {e.Message}");
+          _exceptions.Add(e);
         }
       }
 

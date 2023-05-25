@@ -34,6 +34,8 @@ public class Rater {
 
   private Dictionary<int, RatingData> _ratingData = new Dictionary<int, RatingData>(); // uid -> rating data
 
+  private int _recordNumber = 0;
+
   /// <summary>
   /// Creates a new instance of Rater.
   /// </summary>
@@ -88,8 +90,11 @@ public class Rater {
       }
 
     } catch (Exception e) {
-      throw new Exception($"Bad record: {e.Message}", e);
+      int? tick = (int?)record["tick"];
+      throw new Exception($"Bad record (#{_recordNumber}) at tick {tick}: {e.Message}", e);
     }
+
+    _recordNumber++;
   }
 
   /// <summary>
