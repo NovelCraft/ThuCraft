@@ -116,7 +116,7 @@ public class Rater {
       Action = 1 + 9 * (decimal)Math.Tanh(0.0001 * ratingData.Actions),
 
       Survival = (1 + 0.3m * ratingData.Kills + 0.02m * ratingData.DamageDealt
-                    + 0.1m * ratingData.Healed + 0.01m * ratingData.DamageTaken)
+                    + 0.1m * ratingData.Healed)
                / (1 + 0.2m * ratingData.Deaths),
 
       Exploration = 1 + 0.5m * (decimal)Math.Log(Math.Max(ratingData.SectionVisisted.Count, 1), 2)
