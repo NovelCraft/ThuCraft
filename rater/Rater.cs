@@ -86,7 +86,7 @@ public class Rater {
     HashSet<int> itemTypesGot = ratingData.ItemTypesGot;
     return new Rating {
       Token = ratingData.Token,
-      Action = 1 + 9 * (decimal)Math.Tanh(0.00001 * ratingData.ActionsOfPerform + ratingData.ActionsOfPing),
+      Action = 1 + 9 * (decimal)Math.Tanh(0.0001 * ratingData.ActionsOfPerform + ratingData.ActionsOfPing),
 
       Survival = (1 + 0.3m * ratingData.Kills + 0.02m * ratingData.DamageDealt
                     + 0.1m * ratingData.Healed)
