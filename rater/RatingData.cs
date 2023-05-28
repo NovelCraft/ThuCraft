@@ -53,7 +53,7 @@ public class RatingData {
   [JsonProperty("diamond_ore_mined")]
   public int DiamondOreMined { get; set; } = 0;
 
-  [JsonProperty("redstone_ore_mined")]
+  [JsonProperty("leaves_mined")]
   public int LeavesBroken { get; set; } = 0;
 
   [JsonIgnore]
