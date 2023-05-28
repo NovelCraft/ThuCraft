@@ -7,33 +7,6 @@ using Newtonsoft.Json.Linq;
 /// Rater rates records.
 /// </summary>
 public class Rater {
-  public class RatingData {
-    public string? Token { get; set; } = null;
-
-    // Action
-    public int Actions { get; set; } = 0;
-
-    // Survival
-    public int Kills { get; set; } = 0;
-    public int Deaths { get; set; } = 0;
-    public decimal DamageDealt { get; set; } = 0m;
-    public decimal DamageTaken { get; set; } = 0m;
-    public decimal Healed { get; set; } = 0m;
-
-    // Exploration
-    public HashSet<(int, int, int)> SectionVisisted { get; set; } = new HashSet<(int, int, int)>();
-    public int CoalOreMined { get; set; } = 0;
-    public int IronOreMined { get; set; } = 0;
-    public int GoldOreMined { get; set; } = 0;
-    public int DiamondOreMined { get; set; } = 0;
-    public int LeavesBroken { get; set; } = 0;
-    public HashSet<int> BlockTypesBroken { get; set; } = new HashSet<int>();
-
-    // Creation
-    public HashSet<int> ItemTypesGot { get; set; } = new HashSet<int>();
-    public HashSet<int> BlockTypesPlaced { get; set; } = new HashSet<int>();
-  }
-
   private Dictionary<int, RatingData> _ratingData = new Dictionary<int, RatingData>(); // uid -> rating data
 
   private int _recordNumber = 0;
@@ -113,25 +86,26 @@ public class Rater {
     HashSet<int> itemTypesGot = ratingData.ItemTypesGot;
     return new Rating {
       Token = ratingData.Token,
-      Action = 1 + 9 * (decimal)Math.Tanh(0.0001 * ratingData.Actions),
+      Action = 1 + 9 * (decimal)Math.Tanh(0.00001 * ratingData.ActionsOfPerform + ratingData.ActionsOfPing),
 
       Survival = (1 + 0.3m * ratingData.Kills + 0.02m * ratingData.DamageDealt
                     + 0.1m * ratingData.Healed)
                / (1 + 0.2m * ratingData.Deaths),
 
-      Exploration = 1 + 0.5m * (decimal)Math.Log(Math.Max(ratingData.SectionVisisted.Count, 1), 2)
+      Exploration = 1 + 0.5m * (decimal)Math.Log(Math.Max(ratingData.SectionVisistedCount, 1), 2)
                       + 0.05m * ratingData.CoalOreMined + 0.06m * ratingData.IronOreMined
                       + 0.12m * ratingData.GoldOreMined + 0.24m * ratingData.DiamondOreMined
                       + 0.01m * ratingData.LeavesBroken
-                      + 0.3m * ratingData.BlockTypesBroken.Count,
+                      + 0.3m * ratingData.BlockTypesBrokenCount,
 
-      Creation = 1 + 0.1m * itemTypesGot.Count
-                   + 0.3m * ratingData.BlockTypesPlaced.Count
+      Creation = 1 + 0.1m * ratingData.ItemTypesGotCount
+                   + 0.3m * ratingData.BlockTypesPlacedCount
                    + 0.05m * itemTypesGot.Where(s => (new List<int> { 9, 10, 11, 12 }).Contains(s)).Count()
                    + 0.15m * itemTypesGot.Where(s => (new List<int> { 13, 14, 15, 16 }).Contains(s)).Count()
                    + 0.25m * itemTypesGot.Where(s => (new List<int> { 24, 25, 26, 27 }).Contains(s)).Count()
                    + 0.3m * itemTypesGot.Where(s => (new List<int> { 28, 29, 30, 31 }).Contains(s)).Count()
-                   + 0.5m * itemTypesGot.Where(s => (new List<int> { 32, 33, 34, 35 }).Contains(s)).Count()
+                   + 0.5m * itemTypesGot.Where(s => (new List<int> { 32, 33, 34, 35 }).Contains(s)).Count(),
+      Details = ratingData
     };
   }
 
@@ -156,13 +130,15 @@ public class Rater {
 
     foreach (JObject agent in AgentList) {
       string token = agent["token"]?.ToString() ?? throw new Exception("Missing agent token.");
+      string name = agent["name"]?.ToString() ?? throw new Exception("Missing agent name.");
       int uniqueId = (int?)agent["unique_id"] ?? throw new Exception("Missing agent unique ID.");
 
-      if((from uid in GetUniqueIdList() where GetRatingData(uid).Token == token select uid).Count() > 0) {
+      if ((from uid in GetUniqueIdList() where GetRatingData(uid).Token == token select uid).Count() > 0) {
         throw new Exception($"Token {token} already used.");
       }
 
       GetRatingData(uniqueId).Token = token;
+      GetRatingData(uniqueId).Name = name;
     }
   }
 
@@ -306,6 +282,17 @@ public class Rater {
 
   private void HandleAfterReceiveMessage(JObject recordData) {
     int playerUniqueId = (int?)recordData["unique_id"] ?? throw new Exception("Missing player unique ID.");
-    GetRatingData(playerUniqueId).Actions++;
+
+    int typeCode = (int?)(recordData["message"]?["type"]) ?? throw new Exception("Missing message type.");
+
+    if (typeCode == 100) {
+      GetRatingData(playerUniqueId).ActionsOfPing++;
+
+    } else if (typeCode >= 300 && typeCode < 400) {
+      GetRatingData(playerUniqueId).ActionsOfGet++;
+
+    } else if (typeCode >= 500 && typeCode < 600) {
+      GetRatingData(playerUniqueId).ActionsOfPerform++;
+    }
   }
 }
